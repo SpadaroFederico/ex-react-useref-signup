@@ -3,6 +3,35 @@ import { useState } from 'react'
 
 function App() {
   
+const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const numbers = "0123456789";
+const symbols = "!@#$%^&*()-_=+[]{}|;:'\\\",.<>?/`~";
+
+
+  const validateUsername = (value) => {
+  const isValid = /^[a-zA-Z0-9]{6,}$/.test(value); // Alfanumerico, min 6 caratteri
+  return isValid ? '' : 'Username non valido (solo lettere/numeri, min 6 caratteri)';
+};
+
+const validatePassword = (value) => {
+  const hasLetters = [...value].some((char) => letters.includes(char));
+  const hasNumbers = [...value].some((char) => numbers.includes(char));
+  const hasSymbols = [...value].some((char) => symbols.includes(char));
+  const isLongEnough = value.length >= 8;
+
+  const isValid = hasLetters && hasNumbers && hasSymbols && isLongEnough;
+
+  return isValid ? '' : 'Password non valida (min 8 caratteri, almeno una lettera, un numero e un simbolo)';
+
+};
+
+const validateDescription= (value) => {
+  const isLongEnough = value.length >= 100 && value.length <= 1000;
+
+  return isLongEnough ? '' : 'La descrizione deve essere tra 100 e 1000 caratteri';
+};
+
+
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
   const [username, setUsername] = useState('');
@@ -83,9 +112,18 @@ function App() {
         <input 
         type="text"
         value = {username}
-        onChange = {(e) => setUsername(e.target.value)}
+        onChange={(e) => {
+          const value = e.target.value;
+          setUsername(value);
+          setErrors((prev) => ({
+            ...prev,
+            username: validateUsername(value)
+          }));
+        }}
         />
-        {errors.username && <span className="error">{errors.username}</span>}
+        <span className={errors.username ? 'error' : 'valid'}>
+          {errors.username || 'Username valido'}
+        </span>      
       </div>
 
       {/* campo password */}
@@ -94,9 +132,18 @@ function App() {
         <input 
         type="text"
         value = {password}
-        onChange = {(e) => setPassword(e.target.value)}
+        onChange = {(e) => {
+          const value = e.target.value;
+          setPassword(value);
+          setErrors((prev) => ({
+            ...prev,
+            password: validatePassword(value)
+          }));
+          }}
         />
-        {errors.password && <span className="error">{errors.password}</span>}
+        <span className={errors.password ? 'error' : 'valid'}>
+          {errors.password || 'Password valida'}
+        </span>
       </div>
 
       {/* campo specializzazione */}
@@ -126,7 +173,14 @@ function App() {
         <label>Descrizione:</label>
         <textarea 
         value = {description}
-        onChange = {(e) => setDescription(e.target.value)}
+        onChange = {(e) => {
+          const value = e.target.value;
+          setDescription (value);
+          setErrors((prev) => ({
+            ...prev,
+            description: validateDescription(value)
+          }));
+        }}
         />
         {errors.description && <span className="error">{errors.description}</span>}
       </div>
