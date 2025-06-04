@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 
 
 function App() {
@@ -32,25 +32,30 @@ const validateDescription= (value) => {
 };
 
 
-  const [name, setName] = useState('');
-  const [surname, setSurname] = useState('');
+  const nameRef = useRef(null);
+  const surnameRef = useRef(null);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [specialization, setSpecialization] = useState('');
-  const [experienceYears, setExperienceYears] = useState(0);
+  const specializationRef = useRef(null);
+  const experienceYearsRef = useRef(null);
   const [description, setDescription] = useState('');
   const [errors, setErrors] = useState({});
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const name = nameRef.current.value.trim();
+    const surname = surnameRef.current.value.trim();
+    const specialization = specializationRef.current.value.trim();
+    const experienceYears = parseInt(experienceYearsRef.current.value);
+    
     const newErrors = {};
-
-    if (!name.trim()) newErrors.name = 'Il nome è obbligatorio';
-    if(!surname.trim()) newErrors.surname = 'Il cognome è obbligatorio';
+    
+    if (!name) newErrors.name = 'Il nome è obbligatorio';
+    if(!surname) newErrors.surname = 'Il cognome è obbligatorio';
     if (!username.trim()) newErrors.username = 'Usuername non inserito';
     if (!password.trim()) newErrors.password = 'nessuna password inserita';
-    if (!specialization.trim()) newErrors.specialization = 'Specializzazione non selezionata';
+    if (!specialization) newErrors.specialization = 'Specializzazione non selezionata';
     if (experienceYears <= 0) newErrors.experienceYears = 'Anni di esperienza non validi';
     if (!description.trim()) newErrors.description = 'Descrizione non inserita';
 
@@ -73,11 +78,12 @@ const validateDescription= (value) => {
   alert('Form submitted successfully!');
 
   // Reset del form 
-    setName('');
+    nameRef.current.value = '';
+    surnameRef.current.value = '';
+    specializationRef.current.value = 'Full Stack'; 
+    experienceYearsRef.current.value = '';
     setUsername('');
     setPassword('');
-    setSpecialization('');
-    setExperienceYears(0);
     setDescription('');
     setErrors({});
   };
@@ -89,8 +95,7 @@ const validateDescription= (value) => {
       <div>
         <label>Nome Completo:</label>
         <input type="text" 
-         value={name}
-         onChange={(e) => setName(e.target.value)}
+         ref={nameRef}
         />
         {errors.name && <span className="error">{errors.name}</span>}
       </div>
@@ -100,8 +105,7 @@ const validateDescription= (value) => {
         <label>Cognome:</label>
         <input 
         type="text"
-        value = {surname}
-        onChange = {(e) => setSurname(e.target.value)}
+        ref={surnameRef}
         />
         {errors.surname && <span className="error">{errors.surname}</span>}
       </div>
@@ -149,7 +153,7 @@ const validateDescription= (value) => {
       {/* campo specializzazione */}
       <div>
         <label>Specializzazione:</label>
-        <select name="select" value={specialization} onChange={(e) => setSpecialization(e.target.value)}>
+        <select name="select" ref={specializationRef}>
           <option value="Full Stack">Full Stack</option>
           <option value="Frontend">Frontend</option>
           <option value="Backend">Backend</option>
@@ -162,8 +166,7 @@ const validateDescription= (value) => {
         <label>Anni di esperienza:</label>
         <input 
         type="number"
-        value = {experienceYears}
-        onChange = {(e) => setExperienceYears(e.target.value)}
+        ref={experienceYearsRef}
         />
         {errors.experienceYears && <span className="error">{errors.experienceYears}</span>}
       </div>
@@ -182,7 +185,10 @@ const validateDescription= (value) => {
           }));
         }}
         />
-        {errors.description && <span className="error">{errors.description}</span>}
+        <span className={errors.description ? 'error' : 'valid'}>
+          {errors.description || 'Descrizione valida'}
+        </span>
+
       </div>
       <button type="submit">Registrati</button>
 
